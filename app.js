@@ -1,4 +1,5 @@
 const tg = window.Telegram.WebApp;
+
 tg.ready();
 tg.expand();
 
@@ -26,8 +27,8 @@ const directions = {
   "Магистратура": [
     "Юриспруденция",
     "Менеджмент",
-    "Государственное и муниципальное управление",
-    "Экономика",
+    "Государственное и муниципальное управление (магистратура)",
+    "Экономика (магистратура)",
   ],
   "Аспирантура": [
     "Региональная и отраслевая экономика",
@@ -71,7 +72,7 @@ docSelect.addEventListener("change", () => {
     levelSelect.appendChild(opt);
   });
 
-  // ВАЖНО: если уровень один (например только Бакалавриат) — сразу подставим направления
+  // Если уровень один (например, только Бакалавриат) — сразу подставим направления
   if (levels.length === 1) {
     fillDirections(levels[0]);
   }
@@ -90,7 +91,6 @@ sendBtn.addEventListener("click", () => {
   const level = levelSelect.value;
   const direction = directionSelect.value;
 
-  // Простая проверка
   if (!fio || !birth || !email || !doc || !level || !direction) {
     tg.showAlert("Пожалуйста, заполните все поля перед отправкой.");
     return;
@@ -105,6 +105,8 @@ sendBtn.addEventListener("click", () => {
     direction,
   };
 
+  // Для надёжности покажем, что отправили
+  tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
   tg.sendData(JSON.stringify(data));
-  tg.close(); // закрываем мини-приложение, пользователь возвращается в чат
+  tg.close();
 });

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вступительные испытания</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h2>Анкета абитуриента</h2>
+
+  <label>ФИО</label>
+  <input id="fio" type="text" placeholder="Иванов Иван Иванович" />
+
+  <label>Дата рождения</label>
+  <input id="birth" type="date" />
+
+  <label>E-mail</label>
+  <input id="email" type="email" placeholder="example@mail.ru" />
+
+  <label>Документ об образовании</label>
+  <select id="doc_type">
+    <option value="">Выберите документ</option>
+    <option>Аттестат о среднем общем образовании</option>
+    <option>Диплом СПО (колледж)</option>
+    <option>Диплом бакалавра</option>
+    <option>Диплом специалиста</option>
+    <option>Диплом магистра</option>
+  </select>
+
+  <label>Уровень образования</label>
+  <select id="level"></select>
+
+  <label>Направление подготовки</label>
+  <select id="direction"></select>
+
+  <button id="send">Отправить заявку</button>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

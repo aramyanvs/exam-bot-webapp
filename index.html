@@ -1,43 +1,64 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Вступительные испытания</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <title>Вступительные испытания МЭИ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+    <div class="container">
+        <h1>Заявка на вступительные испытания</h1>
 
-  <h2>Анкета абитуриента</h2>
+        <label>
+            ФИО
+            <input type="text" id="fio" placeholder="Иванов Иван Иванович" />
+        </label>
 
-  <label>ФИО</label>
-  <input id="fio" type="text" placeholder="Иванов Иван Иванович" />
+        <label>
+            Дата рождения
+            <input type="date" id="birth" />
+        </label>
 
-  <label>Дата рождения</label>
-  <input id="birth" type="date" />
+        <label>
+            E-mail
+            <input type="email" id="email" placeholder="example@mail.ru" />
+        </label>
 
-  <label>E-mail</label>
-  <input id="email" type="email" placeholder="example@mail.ru" />
+        <label>
+            Документ об образовании
+            <select id="doc_type">
+                <option value="">Выберите документ</option>
+                <option value="Аттестат о среднем общем образовании">
+                    Аттестат о среднем общем образовании
+                </option>
+                <option value="Диплом СПО (колледж)">
+                    Диплом СПО (колледж)
+                </option>
+                <option value="Диплом бакалавра">Диплом бакалавра</option>
+                <option value="Диплом специалиста">Диплом специалиста</option>
+                <option value="Диплом магистра">Диплом магистра</option>
+            </select>
+        </label>
 
-  <label>Документ об образовании</label>
-  <select id="doc_type">
-    <option value="">Выберите документ</option>
-    <option>Аттестат о среднем общем образовании</option>
-    <option>Диплом СПО (колледж)</option>
-    <option>Диплом бакалавра</option>
-    <option>Диплом специалиста</option>
-    <option>Диплом магистра</option>
-  </select>
+        <label>
+            Уровень образования
+            <select id="level">
+                <option value="">Сначала выберите документ</option>
+            </select>
+        </label>
 
-  <label>Уровень образования</label>
-  <select id="level"></select>
+        <label>
+            Направление подготовки
+            <select id="direction">
+                <option value="">Сначала выберите уровень</option>
+            </select>
+        </label>
 
-  <label>Направление подготовки</label>
-  <select id="direction"></select>
+        <button id="send">Отправить заявку</button>
+    </div>
 
-  <button id="send">Отправить заявку</button>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

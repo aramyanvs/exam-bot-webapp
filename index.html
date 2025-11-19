@@ -2,63 +2,132 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>Вступительные испытания МЭИ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Поступление МЭИ — Заявка</title>
+
+    <!-- Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        body {
+            font-family: system-ui, Arial, sans-serif;
+            background: #f2f2f7;
+            margin: 0;
+            padding: 20px;
+            color: #222;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: #fff;
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            background: #fafafa;
+            outline: none;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 14px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #006ae6;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Заявка на вступительные испытания</h1>
 
-        <label>
-            ФИО
-            <input type="text" id="fio" placeholder="Иванов Иван Иванович" />
-        </label>
+<h1>Анкета поступающего</h1>
 
-        <label>
-            Дата рождения
-            <input type="date" id="birth" />
-        </label>
+<form id="exam-form">
 
-        <label>
-            E-mail
-            <input type="email" id="email" placeholder="example@mail.ru" />
-        </label>
+    <label for="fio">ФИО</label>
+    <input id="fio" type="text" placeholder="Введите ваше ФИО" />
 
-        <label>
-            Документ об образовании
-            <select id="doc_type">
-                <option value="">Выберите документ</option>
-                <option value="Аттестат о среднем общем образовании">
-                    Аттестат о среднем общем образовании
-                </option>
-                <option value="Диплом СПО (колледж)">
-                    Диплом СПО (колледж)
-                </option>
-                <option value="Диплом бакалавра">Диплом бакалавра</option>
-                <option value="Диплом специалиста">Диплом специалиста</option>
-                <option value="Диплом магистра">Диплом магистра</option>
-            </select>
-        </label>
+    <label for="birth">Дата рождения</label>
+    <input id="birth" type="date" />
 
-        <label>
-            Уровень образования
-            <select id="level">
-                <option value="">Сначала выберите документ</option>
-            </select>
-        </label>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="example@mail.ru" />
 
-        <label>
-            Направление подготовки
-            <select id="direction">
-                <option value="">Сначала выберите уровень</option>
-            </select>
-        </label>
+    <label for="doc_type">Документ об образовании</label>
+    <select id="doc_type">
+        <option value="">Выберите документ</option>
+        <option value="Аттестат">Аттестат</option>
+        <option value="Диплом колледжа">Диплом колледжа</option>
+        <option value="Диплом бакалавра">Диплом бакалавра</option>
+        <option value="Диплом специалиста">Диплом специалиста</option>
+        <option value="Диплом магистра">Диплом магистра</option>
+    </select>
 
-        <button id="send">Отправить заявку</button>
-    </div>
+    <label for="level">Уровень образования</label>
+    <select id="level">
+        <!-- сюда app.js сам подставит уровни -->
+    </select>
 
-    <script src="app.js"></script>
+    <label for="direction">Направление подготовки</label>
+    <select id="direction">
+        <option value="">Выберите направление</option>
+
+        <!-- бакалавриат -->
+        <option value="Юриспруденция">Юриспруденция</option>
+        <option value="Менеджмент">Менеджмент</option>
+        <option value="Государственное и муниципальное управление">Государственное и муниципальное управление</option>
+        <option value="Экономика">Экономика</option>
+        <option value="Управление персоналом">Управление персоналом</option>
+        <option value="Дизайн">Дизайн</option>
+        <option value="Бизнес-информатика">Бизнес-информатика</option>
+        <option value="Психология">Психология</option>
+        <option value="ЖКХ">ЖКХ</option>
+
+        <!-- магистратура -->
+        <option value="Юриспруденция (маг)">Юриспруденция (магистратура)</option>
+        <option value="Менеджмент (маг)">Менеджмент (магистратура)</option>
+        <option value="Государственное и муниципальное управление (маг)">Государственное и муниципальное управление (магистратура)</option>
+        <option value="Экономика (маг)">Экономика (магистратура)</option>
+
+        <!-- аспирантура -->
+        <option value="Региональная и отраслевая экономика">Региональная и отраслевая экономика</option>
+        <option value="Общая психология, психология личности, история психологии">Общая психология, психология личности, история психологии</option>
+    </select>
+
+    <button type="submit">Отправить заявку</button>
+</form>
+
+<!-- JS -->
+<script src="app.js"></script>
+
 </body>
 </html>

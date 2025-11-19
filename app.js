@@ -72,7 +72,6 @@ docSelect.addEventListener("change", () => {
     levelSelect.appendChild(opt);
   });
 
-  // Если уровень один (например, только Бакалавриат) — сразу подставим направления
   if (levels.length === 1) {
     fillDirections(levels[0]);
   }
@@ -85,7 +84,7 @@ levelSelect.addEventListener("change", () => {
 
 sendBtn.addEventListener("click", () => {
   const fio = fioInput.value.trim();
-  const birth = birthInput.value; // YYYY-MM-DD
+  const birth = birthInput.value;
   const email = emailInput.value.trim();
   const doc = docSelect.value;
   const level = levelSelect.value;
@@ -105,7 +104,6 @@ sendBtn.addEventListener("click", () => {
     direction,
   };
 
-  // Для надёжности покажем, что отправили
   tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
   tg.sendData(JSON.stringify(data));
   tg.close();

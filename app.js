@@ -1,110 +1,163 @@
-const tg = window.Telegram.WebApp;
+// app.js
 
-tg.ready();
-tg.expand();
+// Ждём, пока загрузится DOM
+document.addEventListener("DOMContentLoaded", function () {
+  // Объект Telegram WebApp
+  const tg = window.Telegram && window.Telegram.WebApp
+    ? window.Telegram.WebApp
+    : null;
 
-const fioInput = document.getElementById("fio");
-const birthInput = document.getElementById("birth");
-const emailInput = document.getElementById("email");
-
-const docSelect = document.getElementById("doc_type");
-const levelSelect = document.getElementById("level");
-const directionSelect = document.getElementById("direction");
-const sendBtn = document.getElementById("send");
-
-const directions = {
-  "Бакалавриат": [
-    "Юриспруденция",
-    "Менеджмент",
-    "Государственное и муниципальное управление",
-    "Экономика",
-    "Управление персоналом",
-    "Дизайн",
-    "Бизнес-информатика",
-    "Психология",
-    "ЖКХ",
-  ],
-  "Магистратура": [
-    "Юриспруденция",
-    "Менеджмент",
-    "Государственное и муниципальное управление (магистратура)",
-    "Экономика (магистратура)",
-  ],
-  "Аспирантура": [
-    "Региональная и отраслевая экономика",
-    "Общая психология, психология личности, история психологии",
-  ],
-};
-
-function fillDirections(level) {
-  directionSelect.innerHTML = "";
-  const list = directions[level] || [];
-  list.forEach((dir) => {
-    const opt = document.createElement("option");
-    opt.value = dir;
-    opt.textContent = dir;
-    directionSelect.appendChild(opt);
-  });
-}
-
-docSelect.addEventListener("change", () => {
-  levelSelect.innerHTML = "";
-  directionSelect.innerHTML = "";
-
-  const doc = docSelect.value;
-  let levels = [];
-
-  if (
-    doc === "Аттестат о среднем общем образовании" ||
-    doc === "Диплом СПО (колледж)"
-  ) {
-    levels = ["Бакалавриат"];
-  } else if (doc === "Диплом бакалавра") {
-    levels = ["Бакалавриат", "Магистратура"];
-  } else if (doc === "Диплом специалиста" || doc === "Диплом магистра") {
-    levels = ["Бакалавриат", "Магистратура", "Аспирантура"];
-  }
-
-  levels.forEach((lvl) => {
-    const opt = document.createElement("option");
-    opt.value = lvl;
-    opt.textContent = lvl;
-    levelSelect.appendChild(opt);
-  });
-
-  if (levels.length === 1) {
-    fillDirections(levels[0]);
-  }
-});
-
-levelSelect.addEventListener("change", () => {
-  const level = levelSelect.value;
-  fillDirections(level);
-});
-
-sendBtn.addEventListener("click", () => {
-  const fio = fioInput.value.trim();
-  const birth = birthInput.value;
-  const email = emailInput.value.trim();
-  const doc = docSelect.value;
-  const level = levelSelect.value;
-  const direction = directionSelect.value;
-
-  if (!fio || !birth || !email || !doc || !level || !direction) {
-    tg.showAlert("Пожалуйста, заполните все поля перед отправкой.");
+  if (!tg) {
+    console.error("Telegram WebApp API не найден. Проверь <script src=\"https://telegram.org/js/telegram-web-app.js\"></script> в HTML.");
     return;
   }
 
-  const data = {
-    fio,
-    birth,
-    email,
-    doc,
-    level,
-    direction,
-  };
+  // Сообщаем Telegram, что WebApp готов
+  tg.ready();
 
-  tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
-  tg.sendData(JSON.stringify(data));
-  tg.close();
+  // Берём элементы формы
+  const form = document.getElementById("exam-form");
+  const fioInput = document.getElementById("fio");
+  const birthInput = document.getElementById("birth");
+  const emailInput = document.getElementById("email");
+  const docTypeSelect = document.getElementById("doc_type");
+  const levelSelect = document.getElementById("level");
+  const directionSelect = document.getElementById("direction");
+
+  if (!form || !fioInput || !birthInput || !emailInput || !docTypeSelect || !levelSelect || !directionSelect) {
+    console.error("Не найдены какие-то элементы формы. Проверь id полей в HTML.");
+    return;
+  }
+
+  // === ЛОГИКА ВЫБОРА УРОВНЯ В ЗАВИСИМОСТИ ОТ ДОКУМЕНТА ===
+  // Пример:
+  // - Аттестат / Диплом колледжа -> только Бакалавриат
+  // - Диплом бакалавра -> Бакалавриат + Магистратура
+  // - Диплом специалиста / магистра -> все три уровня
+
+  const ALL_LEVEL_OPTIONS = [
+    { value: "Бакалавриат", label: "Бакалавриат" },
+    { value: "Магистратура", label: "Магистратура" },
+    { value: "Аспирантура", label: "Аспирантура" },
+  ];
+
+  function updateLevelOptions() {
+    const docType = docTypeSelect.value;
+
+    let allowedLevels = [];
+
+    if (docType === "Аттестат" || docType === "Диплом колледжа") {
+      allowedLevels = ["Бакалавриат"];
+    } else if (docType === "Диплом бакалавра") {
+      allowedLevels = ["Бакалавриат", "Магистратура"];
+    } else if (docType === "Диплом специалиста" || docType === "Диплом магистра") {
+      allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
+    } else {
+      // если что-то непонятное — даём все уровни
+      allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
+    }
+
+    // Чистим select
+    levelSelect.innerHTML = "";
+
+    // Добавляем только разрешённые уровни
+    ALL_LEVEL_OPTIONS.forEach((opt) => {
+      if (allowedLevels.includes(opt.value)) {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.textContent = opt.label;
+        levelSelect.appendChild(option);
+      }
+    });
+  }
+
+  // Обновляем уровни при смене типа документа
+  docTypeSelect.addEventListener("change", updateLevelOptions);
+
+  // Первый вызов при загрузке
+  updateLevelOptions();
+
+  // === ПРОСТАЯ ВАЛИДАЦИЯ ===
+
+  function validateForm() {
+    const fio = fioInput.value.trim();
+    const birth = birthInput.value.trim();
+    const email = emailInput.value.trim();
+    const docType = docTypeSelect.value;
+    const level = levelSelect.value;
+    const direction = directionSelect.value;
+
+    if (!fio) {
+      tg.showAlert("Пожалуйста, укажите ФИО.");
+      return false;
+    }
+
+    if (!birth) {
+      tg.showAlert("Пожалуйста, укажите дату рождения.");
+      return false;
+    }
+
+    if (!email) {
+      tg.showAlert("Пожалуйста, укажите email.");
+      return false;
+    }
+
+    // Простейшая проверка email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      tg.showAlert("Похоже, email указан неверно.");
+      return false;
+    }
+
+    if (!docType) {
+      tg.showAlert("Пожалуйста, выберите документ об образовании.");
+      return false;
+    }
+
+    if (!level) {
+      tg.showAlert("Пожалуйста, выберите уровень образования.");
+      return false;
+    }
+
+    if (!direction) {
+      tg.showAlert("Пожалуйста, выберите направление подготовки.");
+      return false;
+    }
+
+    return true;
+  }
+
+  // === ОТПРАВКА ДАННЫХ В БОТА ===
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const payload = {
+      fio: fioInput.value.trim(),
+      birth: birthInput.value.trim(),
+      email: emailInput.value.trim(),
+      doc_type: docTypeSelect.value,
+      level: levelSelect.value,
+      direction: directionSelect.value,
+    };
+
+    console.log("Отправляем в бот:", payload);
+
+    try {
+      // КЛЮЧЕВАЯ СТРОКА: данные улетают в бота
+      tg.sendData(JSON.stringify(payload));
+
+      // Показываем пользователю сообщение
+      tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
+
+      // Можно закрыть WebApp (по желанию)
+      // tg.close();
+    } catch (err) {
+      console.error("Ошибка при отправке данных в бота:", err);
+      tg.showAlert("Не удалось отправить заявку. Попробуйте ещё раз.");
+    }
+  });
 });

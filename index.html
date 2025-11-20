@@ -13,28 +13,27 @@
 <body>
   <div class="card">
     <h1>Запись на вступительные испытания</h1>
-    <p>Заполните анкету, чтобы подать заявку в приёмную комиссию МЭИ.</p>
 
     <form id="exam-form">
       <div class="field">
         <label for="fio">ФИО</label>
-        <input id="fio" type="text" placeholder="Иванов Иван Иванович" />
+        <input id="fio" type="text" placeholder="Иванов Иван Иванович" required />
       </div>
 
       <div class="field">
         <label for="birth">Дата рождения</label>
-        <input id="birth" type="date" />
+        <input id="birth" type="date" required />
       </div>
 
       <div class="field">
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="name@example.com" />
+        <label for="email">E-mail</label>
+        <input id="email" type="email" placeholder="name@example.com" required />
       </div>
 
       <div class="field">
         <label for="doc_type">Документ об образовании</label>
-        <select id="doc_type">
-          <option value="">Выберите документ…</option>
+        <select id="doc_type" required>
+          <option value="">Выберите документ</option>
           <option value="Аттестат о среднем общем образовании">
             Аттестат о среднем общем образовании
           </option>
@@ -46,24 +45,23 @@
       </div>
 
       <div class="field">
-        <label for="level">Уровень обучения</label>
-        <select id="level">
-          <option value="">Сначала выберите документ…</option>
+        <label for="level">Уровень образования</label>
+        <select id="level" required>
+          <!-- Заполняется из JS -->
         </select>
       </div>
 
       <div class="field">
         <label for="direction">Направление подготовки</label>
-        <select id="direction">
-          <option value="">Сначала выберите уровень…</option>
+        <select id="direction" required>
+          <!-- Заполняется из JS -->
         </select>
       </div>
 
-      <button type="submit" class="btn-primary">Отправить заявку</button>
+      <button id="send" type="submit">Отправить заявку</button>
     </form>
   </div>
 
-  <!-- наш скрипт -->
-  <script src="app.js?v=3"></script>
+  <script src="app.js"></script>
 </body>
 </html>

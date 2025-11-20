@@ -1,18 +1,22 @@
-// app.js — ЧИСТАЯ ВЕРСИЯ
+// app.js
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
+  // Telegram WebApp API
   const tg = window.Telegram && window.Telegram.WebApp
     ? window.Telegram.WebApp
     : null;
 
   if (!tg) {
-    console.error("Telegram WebApp API не найден.");
+    console.error(
+      'Telegram WebApp API не найден. Проверь <script src="https://telegram.org/js/telegram-web-app.js"></script> в index.html.'
+    );
     return;
   }
 
   tg.ready();
   tg.expand();
 
+  // Элементы формы
   const form = document.getElementById("exam-form");
   const fioInput = document.getElementById("fio");
   const birthInput = document.getElementById("birth");
@@ -21,7 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const levelSelect = document.getElementById("level");
   const directionSelect = document.getElementById("direction");
 
-  // Направления по уровням
+  if (
+    !form ||
+    !fioInput ||
+    !birthInput ||
+    !emailInput ||
+    !docTypeSelect ||
+    !levelSelect ||
+    !directionSelect
+  ) {
+    console.error("Не найдены какие-то элементы формы. Проверь id полей в HTML.");
+    return;
+  }
+
+  // Справочник направлений по уровню
   const DIRECTIONS = {
     "Бакалавриат": [
       "Юриспруденция",
@@ -46,19 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
   };
 
-  // Обновляем список направлений под выбранный уровень
   function fillDirections(level) {
     directionSelect.innerHTML = "";
-
-    if (!level || !DIRECTIONS[level]) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "Сначала выберите уровень";
-      directionSelect.appendChild(opt);
-      return;
-    }
-
-    DIRECTIONS[level].forEach((dir) => {
+    const list = DIRECTIONS[level] || [];
+    list.forEach((dir) => {
       const opt = document.createElement("option");
       opt.value = dir;
       opt.textContent = dir;
@@ -66,61 +74,56 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Обновляем уровни в зависимости от документа
+  // Какие уровни доступны в зависимости от документа
   function updateLevelOptions() {
     const docType = docTypeSelect.value;
-    levelSelect.innerHTML = "";
-    directionSelect.innerHTML = "";
-
-    let levels = [];
+    let allowedLevels = [];
 
     if (
       docType === "Аттестат о среднем общем образовании" ||
       docType === "Диплом СПО (колледж)"
     ) {
-      levels = ["Бакалавриат"];
+      allowedLevels = ["Бакалавриат"];
     } else if (docType === "Диплом бакалавра") {
-      levels = ["Бакалавриат", "Магистратура"];
+      allowedLevels = ["Бакалавриат", "Магистратура"];
     } else if (
       docType === "Диплом специалиста" ||
       docType === "Диплом магистра"
     ) {
-      levels = ["Бакалавриат", "Магистратура", "Аспирантура"];
+      allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
+    } else {
+      // На всякий случай — все уровни
+      allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
     }
 
-    if (levels.length === 0) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "Сначала выберите документ";
-      levelSelect.appendChild(opt);
-      const opt2 = document.createElement("option");
-      opt2.value = "";
-      opt2.textContent = "Сначала выберите уровень";
-      directionSelect.appendChild(opt2);
-      return;
-    }
-
-    levels.forEach((lvl) => {
+    levelSelect.innerHTML = "";
+    allowedLevels.forEach((lvl) => {
       const opt = document.createElement("option");
       opt.value = lvl;
       opt.textContent = lvl;
       levelSelect.appendChild(opt);
     });
 
-    // Автозаполняем направления для первого уровня
-    fillDirections(levels[0]);
+    if (allowedLevels.length > 0) {
+      fillDirections(allowedLevels[0]);
+    } else {
+      directionSelect.innerHTML = "";
+    }
   }
 
-  // Слушатель смены документа
-  docTypeSelect.addEventListener("change", updateLevelOptions);
-
-  // Слушатель смены уровня
+  // При смене уровня — обновляем направления
   levelSelect.addEventListener("change", () => {
     const level = levelSelect.value;
     fillDirections(level);
   });
 
-  // Простая валидация
+  // При смене документа — обновляем уровни и направления
+  docTypeSelect.addEventListener("change", updateLevelOptions);
+
+  // Первый вызов при загрузке
+  updateLevelOptions();
+
+  // Валидация формы
   function validateForm() {
     const fio = fioInput.value.trim();
     const birth = birthInput.value.trim();
@@ -133,26 +136,33 @@ document.addEventListener("DOMContentLoaded", () => {
       tg.showAlert("Пожалуйста, укажите ФИО.");
       return false;
     }
+
     if (!birth) {
       tg.showAlert("Пожалуйста, укажите дату рождения.");
       return false;
     }
+
     if (!email) {
       tg.showAlert("Пожалуйста, укажите email.");
       return false;
     }
+
+    // Простейшая проверка email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      tg.showAlert("Похоже, email указан некорректно.");
+      tg.showAlert("Похоже, email указан неверно.");
       return false;
     }
+
     if (!docType) {
       tg.showAlert("Пожалуйста, выберите документ об образовании.");
       return false;
     }
+
     if (!level) {
       tg.showAlert("Пожалуйста, выберите уровень образования.");
       return false;
     }
+
     if (!direction) {
       tg.showAlert("Пожалуйста, выберите направление подготовки.");
       return false;
@@ -162,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Отправка данных в бота
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -174,8 +184,8 @@ document.addEventListener("DOMContentLoaded", () => {
       birth: birthInput.value.trim(),
       email: emailInput.value.trim(),
       doc_type: docTypeSelect.value,   // ВАЖНО: doc_type — как в bot.py
-      level: levelSelect.value,
-      direction: directionSelect.value,
+      level: levelSelect.value,        // ВАЖНО: level — как в bot.py
+      direction: directionSelect.value // ВАЖНО: direction — как в bot.py
     };
 
     console.log("Отправляем в бота:", payload);
@@ -183,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       tg.sendData(JSON.stringify(payload));
       tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
-      // Можно закрыть WebApp, если нужно
+      // Можно закрыть WebApp после отправки:
       // tg.close();
     } catch (err) {
       console.error("Ошибка при отправке данных в бота:", err);

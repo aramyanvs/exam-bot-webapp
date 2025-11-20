@@ -1,133 +1,113 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Поступление МЭИ — Заявка</title>
+  <meta charset="UTF-8" />
+  <title>Запись на вступительные испытания — МЭИ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Telegram WebApp API -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
-        body {
-            font-family: system-ui, Arial, sans-serif;
-            background: #f2f2f7;
-            margin: 0;
-            padding: 20px;
-            color: #222;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-
-        form {
-            background: #fff;
-            padding: 18px;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        label {
-            display: block;
-            margin-top: 12px;
-            margin-bottom: 4px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            font-size: 15px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            background: #fafafa;
-            outline: none;
-        }
-
-        button {
-            margin-top: 20px;
-            width: 100%;
-            padding: 14px;
-            background: #007aff;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        button:hover {
-            background: #006ae6;
-        }
-    </style>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f7;
+      color: #111;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <h1>Заявка на вступительные испытания</h1>
 
-<h1>Анкета поступающего</h1>
+    <form id="exam-form">
+      <div class="field">
+        <label for="fio">ФИО</label>
+        <input id="fio" type="text" placeholder="Иванов Иван Иванович" />
+      </div>
 
-<form id="exam-form">
+      <div class="field">
+        <label for="birth">Дата рождения</label>
+        <input id="birth" type="date" />
+      </div>
 
-    <label for="fio">ФИО</label>
-    <input id="fio" type="text" placeholder="Введите ваше ФИО" />
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="example@mail.ru" />
+      </div>
 
-    <label for="birth">Дата рождения</label>
-    <input id="birth" type="date" />
+      <div class="field">
+        <label for="doc_type">Документ об образовании</label>
+        <select id="doc_type">
+          <option value="">— выберите документ —</option>
+          <option value="Аттестат о среднем общем образовании">Аттестат о среднем общем образовании</option>
+          <option value="Диплом СПО (колледж)">Диплом СПО (колледж)</option>
+          <option value="Диплом бакалавра">Диплом бакалавра</option>
+          <option value="Диплом специалиста">Диплом специалиста</option>
+          <option value="Диплом магистра">Диплом магистра</option>
+        </select>
+      </div>
 
-    <label for="email">Email</label>
-    <input id="email" type="email" placeholder="example@mail.ru" />
+      <div class="field">
+        <label for="level">Уровень образования</label>
+        <select id="level">
+          <!-- значения подставит JS -->
+        </select>
+      </div>
 
-    <label for="doc_type">Документ об образовании</label>
-    <select id="doc_type">
-        <option value="">Выберите документ</option>
-        <option value="Аттестат">Аттестат</option>
-        <option value="Диплом колледжа">Диплом колледжа</option>
-        <option value="Диплом бакалавра">Диплом бакалавра</option>
-        <option value="Диплом специалиста">Диплом специалиста</option>
-        <option value="Диплом магистра">Диплом магистра</option>
-    </select>
+      <div class="field">
+        <label for="direction">Направление подготовки</label>
+        <select id="direction">
+          <!-- значения подставит JS -->
+        </select>
+      </div>
 
-    <label for="level">Уровень образования</label>
-    <select id="level">
-        <!-- сюда app.js сам подставит уровни -->
-    </select>
+      <button type="submit">Отправить заявку</button>
+    </form>
+  </div>
 
-    <label for="direction">Направление подготовки</label>
-    <select id="direction">
-        <option value="">Выберите направление</option>
-
-        <!-- бакалавриат -->
-        <option value="Юриспруденция">Юриспруденция</option>
-        <option value="Менеджмент">Менеджмент</option>
-        <option value="Государственное и муниципальное управление">Государственное и муниципальное управление</option>
-        <option value="Экономика">Экономика</option>
-        <option value="Управление персоналом">Управление персоналом</option>
-        <option value="Дизайн">Дизайн</option>
-        <option value="Бизнес-информатика">Бизнес-информатика</option>
-        <option value="Психология">Психология</option>
-        <option value="ЖКХ">ЖКХ</option>
-
-        <!-- магистратура -->
-        <option value="Юриспруденция (маг)">Юриспруденция (магистратура)</option>
-        <option value="Менеджмент (маг)">Менеджмент (магистратура)</option>
-        <option value="Государственное и муниципальное управление (маг)">Государственное и муниципальное управление (магистратура)</option>
-        <option value="Экономика (маг)">Экономика (магистратура)</option>
-
-        <!-- аспирантура -->
-        <option value="Региональная и отраслевая экономика">Региональная и отраслевая экономика</option>
-        <option value="Общая психология, психология личности, история психологии">Общая психология, психология личности, история психологии</option>
-    </select>
-
-    <button type="submit">Отправить заявку</button>
-</form>
-
-<!-- JS -->
-<script src="app.js"></script>
-
+  <script src="app.js"></script>
 </body>
 </html>

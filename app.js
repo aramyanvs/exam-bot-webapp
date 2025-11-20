@@ -1,7 +1,7 @@
-// app.js
+// app.js — минимальный рабочий вариант
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Telegram WebApp API
+  // === Telegram WebApp API ===
   const tg = window.Telegram && window.Telegram.WebApp
     ? window.Telegram.WebApp
     : null;
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   tg.ready();
   tg.expand();
 
-  // Элементы формы
+  // === ЭЛЕМЕНТЫ ФОРМЫ ===
   const form = document.getElementById("exam-form");
   const fioInput = document.getElementById("fio");
   const birthInput = document.getElementById("birth");
@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const docTypeSelect = document.getElementById("doc_type");
   const levelSelect = document.getElementById("level");
   const directionSelect = document.getElementById("direction");
+  const sendBtn = document.getElementById("send"); // на всякий случай
 
   if (
     !form ||
@@ -38,9 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  // Справочник направлений по уровню
+  // === СПРАВОЧНИК НАПРАВЛЕНИЙ ===
   const DIRECTIONS = {
-    "Бакалавриат": [
+    Бакалавриат: [
       "Юриспруденция",
       "Менеджмент",
       "Государственное и муниципальное управление",
@@ -51,13 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
       "Психология",
       "ЖКХ",
     ],
-    "Магистратура": [
+    Магистратура: [
       "Юриспруденция",
       "Менеджмент",
       "Государственное и муниципальное управление (магистратура)",
       "Экономика (магистратура)",
     ],
-    "Аспирантура": [
+    Аспирантура: [
       "Региональная и отраслевая экономика",
       "Общая психология, психология личности, история психологии",
     ],
@@ -74,9 +75,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Какие уровни доступны в зависимости от документа
+  // === ЛОГИКА ВЫБОРА УРОВНЯ ПО ДОКУМЕНТУ ===
+  const ALL_LEVEL_OPTIONS = [
+    { value: "Бакалавриат", label: "Бакалавриат" },
+    { value: "Магистратура", label: "Магистратура" },
+    { value: "Аспирантура", label: "Аспирантура" },
+  ];
+
   function updateLevelOptions() {
     const docType = docTypeSelect.value;
+
     let allowedLevels = [];
 
     if (
@@ -92,38 +100,39 @@ document.addEventListener("DOMContentLoaded", function () {
     ) {
       allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
     } else {
-      // На всякий случай — все уровни
+      // запасной вариант — все уровни
       allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
     }
 
     levelSelect.innerHTML = "";
-    allowedLevels.forEach((lvl) => {
-      const opt = document.createElement("option");
-      opt.value = lvl;
-      opt.textContent = lvl;
-      levelSelect.appendChild(opt);
+
+    ALL_LEVEL_OPTIONS.forEach((opt) => {
+      if (allowedLevels.includes(opt.value)) {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.textContent = opt.label;
+        levelSelect.appendChild(option);
+      }
     });
 
-    if (allowedLevels.length > 0) {
-      fillDirections(allowedLevels[0]);
+    // после пересборки уровней — обновляем направления
+    if (levelSelect.value) {
+      fillDirections(levelSelect.value);
     } else {
       directionSelect.innerHTML = "";
     }
   }
 
-  // При смене уровня — обновляем направления
+  // события на select'ах
+  docTypeSelect.addEventListener("change", updateLevelOptions);
   levelSelect.addEventListener("change", () => {
-    const level = levelSelect.value;
-    fillDirections(level);
+    fillDirections(levelSelect.value);
   });
 
-  // При смене документа — обновляем уровни и направления
-  docTypeSelect.addEventListener("change", updateLevelOptions);
-
-  // Первый вызов при загрузке
+  // первичная инициализация
   updateLevelOptions();
 
-  // Валидация формы
+  // === ВАЛИДАЦИЯ ===
   function validateForm() {
     const fio = fioInput.value.trim();
     const birth = birthInput.value.trim();
@@ -136,45 +145,35 @@ document.addEventListener("DOMContentLoaded", function () {
       tg.showAlert("Пожалуйста, укажите ФИО.");
       return false;
     }
-
     if (!birth) {
       tg.showAlert("Пожалуйста, укажите дату рождения.");
       return false;
     }
-
     if (!email) {
       tg.showAlert("Пожалуйста, укажите email.");
       return false;
     }
-
-    // Простейшая проверка email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       tg.showAlert("Похоже, email указан неверно.");
       return false;
     }
-
     if (!docType) {
       tg.showAlert("Пожалуйста, выберите документ об образовании.");
       return false;
     }
-
     if (!level) {
       tg.showAlert("Пожалуйста, выберите уровень образования.");
       return false;
     }
-
     if (!direction) {
       tg.showAlert("Пожалуйста, выберите направление подготовки.");
       return false;
     }
-
     return true;
   }
 
-  // Отправка данных в бота
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-
+  // === ОТПРАВКА ДАННЫХ В БОТА ===
+  function sendToBot() {
     if (!validateForm()) {
       return;
     }
@@ -183,9 +182,9 @@ document.addEventListener("DOMContentLoaded", function () {
       fio: fioInput.value.trim(),
       birth: birthInput.value.trim(),
       email: emailInput.value.trim(),
-      doc_type: docTypeSelect.value,   // ВАЖНО: doc_type — как в bot.py
-      level: levelSelect.value,        // ВАЖНО: level — как в bot.py
-      direction: directionSelect.value // ВАЖНО: direction — как в bot.py
+      doc_type: docTypeSelect.value,   // ВАЖНО: doc_type, как в bot.py
+      level: levelSelect.value,
+      direction: directionSelect.value,
     };
 
     console.log("Отправляем в бота:", payload);
@@ -193,11 +192,25 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       tg.sendData(JSON.stringify(payload));
       tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
-      // Можно закрыть WebApp после отправки:
+      // при желании можно закрыть мини-приложение:
       // tg.close();
     } catch (err) {
       console.error("Ошибка при отправке данных в бота:", err);
       tg.showAlert("Не удалось отправить заявку. Попробуйте ещё раз.");
     }
+  }
+
+  // отправка по submit формы
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    sendToBot();
   });
+
+  // и по клику на кнопку, если она есть
+  if (sendBtn) {
+    sendBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      sendToBot();
+    });
+  }
 });

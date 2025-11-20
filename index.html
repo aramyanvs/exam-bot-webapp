@@ -2,65 +2,59 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Запись на вступительные испытания — МЭИ</title>
+  <title>Запись на вступительные испытания</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Telegram WebApp SDK -->
+  <!-- Обязательный скрипт Telegram WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="card">
-    <h1>Запись на вступительные испытания</h1>
+  <h2>Заявка на вступительные испытания</h2>
 
-    <form id="exam-form">
-      <div class="field">
-        <label for="fio">ФИО</label>
-        <input id="fio" type="text" placeholder="Иванов Иван Иванович" required />
-      </div>
+  <form id="exam-form">
+    <label>
+      ФИО
+      <input type="text" id="fio" required />
+    </label>
 
-      <div class="field">
-        <label for="birth">Дата рождения</label>
-        <input id="birth" type="date" required />
-      </div>
+    <label>
+      Дата рождения
+      <input type="date" id="birth" required />
+    </label>
 
-      <div class="field">
-        <label for="email">E-mail</label>
-        <input id="email" type="email" placeholder="name@example.com" required />
-      </div>
+    <label>
+      Email
+      <input type="email" id="email" required />
+    </label>
 
-      <div class="field">
-        <label for="doc_type">Документ об образовании</label>
-        <select id="doc_type" required>
-          <option value="">Выберите документ</option>
-          <option value="Аттестат о среднем общем образовании">
-            Аттестат о среднем общем образовании
-          </option>
-          <option value="Диплом СПО (колледж)">Диплом СПО (колледж)</option>
-          <option value="Диплом бакалавра">Диплом бакалавра</option>
-          <option value="Диплом специалиста">Диплом специалиста</option>
-          <option value="Диплом магистра">Диплом магистра</option>
-        </select>
-      </div>
+    <label>
+      Документ об образовании
+      <select id="doc_type" required>
+        <option value="">Выберите документ</option>
+        <option value="Аттестат о среднем общем образовании">Аттестат о среднем общем образовании</option>
+        <option value="Диплом СПО (колледж)">Диплом СПО (колледж)</option>
+        <option value="Диплом бакалавра">Диплом бакалавра</option>
+        <option value="Диплом специалиста">Диплом специалиста</option>
+        <option value="Диплом магистра">Диплом магистра</option>
+      </select>
+    </label>
 
-      <div class="field">
-        <label for="level">Уровень образования</label>
-        <select id="level" required>
-          <!-- Заполняется из JS -->
-        </select>
-      </div>
+    <label>
+      Уровень образования
+      <select id="level" required>
+        <option value="">Сначала выберите документ</option>
+      </select>
+    </label>
 
-      <div class="field">
-        <label for="direction">Направление подготовки</label>
-        <select id="direction" required>
-          <!-- Заполняется из JS -->
-        </select>
-      </div>
+    <label>
+      Направление подготовки
+      <select id="direction" required>
+        <option value="">Сначала выберите уровень</option>
+      </select>
+    </label>
 
-      <button id="send" type="submit">Отправить заявку</button>
-    </form>
-  </div>
+    <button type="submit">Отправить заявку</button>
+  </form>
 
   <script src="app.js"></script>
 </body>

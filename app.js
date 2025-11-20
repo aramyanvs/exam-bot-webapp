@@ -1,4 +1,4 @@
-// app.js — ЧИСТЫЙ ВАРИАНТ
+// app.js — ЧИСТАЯ ВЕРСИЯ
 
 document.addEventListener("DOMContentLoaded", () => {
   const tg = window.Telegram && window.Telegram.WebApp
@@ -6,16 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
     : null;
 
   if (!tg) {
-    console.error(
-      'Telegram WebApp API не найден. Проверь <script src="https://telegram.org/js/telegram-web-app.js"></script> в index.html.'
-    );
+    console.error("Telegram WebApp API не найден.");
     return;
   }
 
   tg.ready();
   tg.expand();
 
-  // Элементы формы
   const form = document.getElementById("exam-form");
   const fioInput = document.getElementById("fio");
   const birthInput = document.getElementById("birth");
@@ -24,9 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const levelSelect = document.getElementById("level");
   const directionSelect = document.getElementById("direction");
 
-  // === Направления по уровням ===
+  // Направления по уровням
   const DIRECTIONS = {
-    Бакалавриат: [
+    "Бакалавриат": [
       "Юриспруденция",
       "Менеджмент",
       "Государственное и муниципальное управление",
@@ -37,22 +34,31 @@ document.addEventListener("DOMContentLoaded", () => {
       "Психология",
       "ЖКХ",
     ],
-    Магистратура: [
+    "Магистратура": [
       "Юриспруденция",
       "Менеджмент",
       "Государственное и муниципальное управление (магистратура)",
       "Экономика (магистратура)",
     ],
-    Аспирантура: [
+    "Аспирантура": [
       "Региональная и отраслевая экономика",
       "Общая психология, психология личности, история психологии",
     ],
   };
 
+  // Обновляем список направлений под выбранный уровень
   function fillDirections(level) {
     directionSelect.innerHTML = "";
-    const list = DIRECTIONS[level] || [];
-    list.forEach((dir) => {
+
+    if (!level || !DIRECTIONS[level]) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "Сначала выберите уровень";
+      directionSelect.appendChild(opt);
+      return;
+    }
+
+    DIRECTIONS[level].forEach((dir) => {
       const opt = document.createElement("option");
       opt.value = dir;
       opt.textContent = dir;
@@ -60,50 +66,61 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Уровни в зависимости от документа ===
-  const ALL_LEVELS = ["Бакалавриат", "Магистратура", "Аспирантура"];
-
+  // Обновляем уровни в зависимости от документа
   function updateLevelOptions() {
     const docType = docTypeSelect.value;
-    let allowed = [];
+    levelSelect.innerHTML = "";
+    directionSelect.innerHTML = "";
+
+    let levels = [];
 
     if (
       docType === "Аттестат о среднем общем образовании" ||
       docType === "Диплом СПО (колледж)"
     ) {
-      allowed = ["Бакалавриат"];
+      levels = ["Бакалавриат"];
     } else if (docType === "Диплом бакалавра") {
-      allowed = ["Бакалавриат", "Магистратура"];
-    } else if (docType === "Диплом специалиста" || docType === "Диплом магистра") {
-      allowed = ["Бакалавриат", "Магистратура", "Аспирантура"];
-    } else {
-      allowed = ALL_LEVELS.slice();
+      levels = ["Бакалавриат", "Магистратура"];
+    } else if (
+      docType === "Диплом специалиста" ||
+      docType === "Диплом магистра"
+    ) {
+      levels = ["Бакалавриат", "Магистратура", "Аспирантура"];
     }
 
-    levelSelect.innerHTML = "";
-    allowed.forEach((lvl) => {
+    if (levels.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "Сначала выберите документ";
+      levelSelect.appendChild(opt);
+      const opt2 = document.createElement("option");
+      opt2.value = "";
+      opt2.textContent = "Сначала выберите уровень";
+      directionSelect.appendChild(opt2);
+      return;
+    }
+
+    levels.forEach((lvl) => {
       const opt = document.createElement("option");
       opt.value = lvl;
       opt.textContent = lvl;
       levelSelect.appendChild(opt);
     });
 
-    if (allowed.length > 0) {
-      fillDirections(allowed[0]);
-    } else {
-      directionSelect.innerHTML = "";
-    }
+    // Автозаполняем направления для первого уровня
+    fillDirections(levels[0]);
   }
 
+  // Слушатель смены документа
   docTypeSelect.addEventListener("change", updateLevelOptions);
+
+  // Слушатель смены уровня
   levelSelect.addEventListener("change", () => {
-    fillDirections(levelSelect.value);
+    const level = levelSelect.value;
+    fillDirections(level);
   });
 
-  // Первый запуск
-  updateLevelOptions();
-
-  // === Валидация ===
+  // Простая валидация
   function validateForm() {
     const fio = fioInput.value.trim();
     const birth = birthInput.value.trim();
@@ -125,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      tg.showAlert("Похоже, email указан неверно.");
+      tg.showAlert("Похоже, email указан некорректно.");
       return false;
     }
     if (!docType) {
@@ -140,10 +157,11 @@ document.addEventListener("DOMContentLoaded", () => {
       tg.showAlert("Пожалуйста, выберите направление подготовки.");
       return false;
     }
+
     return true;
   }
 
-  // === Отправка данных в бота ===
+  // Отправка данных в бота
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -156,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
       birth: birthInput.value.trim(),
       email: emailInput.value.trim(),
       doc_type: docTypeSelect.value,   // ВАЖНО: doc_type — как в bot.py
-      level: levelSelect.value,        // ВАЖНО: level — как в bot.py
+      level: levelSelect.value,
       direction: directionSelect.value,
     };
 
@@ -165,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       tg.sendData(JSON.stringify(payload));
       tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
-      // Можно закрыть WebApp, если хочешь:
+      // Можно закрыть WebApp, если нужно
       // tg.close();
     } catch (err) {
       console.error("Ошибка при отправке данных в бота:", err);

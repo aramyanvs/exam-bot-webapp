@@ -2,60 +2,112 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Запись на вступительные испытания</title>
+  <title>Запись на вступительные испытания — МЭИ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Обязательный скрипт Telegram WebApp -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="styles.css" />
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>Заявка на вступительные испытания</h2>
+  <div class="page">
+    <div class="card">
+      <h1>Запись на вступительные испытания</h1>
+      <p class="subtitle">
+        Заполните форму, чтобы подать заявку на вступительные испытания
+        Московского экономического института.
+      </p>
 
-  <form id="exam-form">
-    <label>
-      ФИО
-      <input type="text" id="fio" required />
-    </label>
+      <form id="exam-form">
+        <!-- ФИО -->
+        <div class="field">
+          <label for="fio">ФИО полностью</label>
+          <input
+            type="text"
+            id="fio"
+            name="fio"
+            placeholder="Иванов Иван Иванович"
+            autocomplete="name"
+            required
+          />
+        </div>
 
-    <label>
-      Дата рождения
-      <input type="date" id="birth" required />
-    </label>
+        <!-- Дата рождения -->
+        <div class="field">
+          <label for="birth">Дата рождения</label>
+          <input
+            type="date"
+            id="birth"
+            name="birth"
+            required
+          />
+        </div>
 
-    <label>
-      Email
-      <input type="email" id="email" required />
-    </label>
+        <!-- Email -->
+        <div class="field">
+          <label for="email">Электронная почта</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="name@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
 
-    <label>
-      Документ об образовании
-      <select id="doc_type" required>
-        <option value="">Выберите документ</option>
-        <option value="Аттестат о среднем общем образовании">Аттестат о среднем общем образовании</option>
-        <option value="Диплом СПО (колледж)">Диплом СПО (колледж)</option>
-        <option value="Диплом бакалавра">Диплом бакалавра</option>
-        <option value="Диплом специалиста">Диплом специалиста</option>
-        <option value="Диплом магистра">Диплом магистра</option>
-      </select>
-    </label>
+        <!-- Документ об образовании -->
+        <div class="field">
+          <label for="doc_type">Документ об образовании</label>
+          <select id="doc_type" name="doc_type" required>
+            <option value="" disabled selected>Выберите документ</option>
+            <option value="Аттестат о среднем общем образовании">
+              Аттестат о среднем общем образовании
+            </option>
+            <option value="Диплом СПО (колледж)">
+              Диплом СПО (колледж)
+            </option>
+            <option value="Диплом бакалавра">
+              Диплом бакалавра
+            </option>
+            <option value="Диплом специалиста">
+              Диплом специалиста
+            </option>
+            <option value="Диплом магистра">
+              Диплом магистра
+            </option>
+          </select>
+        </div>
 
-    <label>
-      Уровень образования
-      <select id="level" required>
-        <option value="">Сначала выберите документ</option>
-      </select>
-    </label>
+        <!-- Уровень образования -->
+        <div class="field">
+          <label for="level">Уровень обучения</label>
+          <select id="level" name="level" required>
+            <!-- Заполняется динамически в app.js -->
+          </select>
+        </div>
 
-    <label>
-      Направление подготовки
-      <select id="direction" required>
-        <option value="">Сначала выберите уровень</option>
-      </select>
-    </label>
+        <!-- Направление подготовки -->
+        <div class="field">
+          <label for="direction">Направление подготовки</label>
+          <select id="direction" name="direction" required>
+            <!-- Заполняется динамически в app.js -->
+          </select>
+        </div>
 
-    <button type="submit">Отправить заявку</button>
-  </form>
+        <button type="submit" id="send" class="btn">
+          Отправить заявку
+        </button>
+      </form>
 
+      <p class="footer">
+        Нажимая кнопку «Отправить заявку», вы подтверждаете корректность
+        введённых данных.
+      </p>
+    </div>
+  </div>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Наш скрипт -->
   <script src="app.js"></script>
 </body>
 </html>

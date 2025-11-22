@@ -5,6 +5,10 @@
   <title>Запись на вступительные испытания — МЭИ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Стили -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,14 +16,13 @@
     <div class="card">
       <h1>Запись на вступительные испытания</h1>
       <p class="subtitle">
-        Заполните форму, чтобы подать заявку на вступительные испытания
-        Московского экономического института.
+        Заполните анкету, и приёмная комиссия свяжется с вами для организации
+        вступительных испытаний в Московском экономическом институте.
       </p>
 
       <form id="exam-form">
-        <!-- ФИО -->
         <div class="field">
-          <label for="fio">ФИО полностью</label>
+          <label for="fio">ФИО</label>
           <input
             type="text"
             id="fio"
@@ -30,7 +33,6 @@
           />
         </div>
 
-        <!-- Дата рождения -->
         <div class="field">
           <label for="birth">Дата рождения</label>
           <input
@@ -41,9 +43,8 @@
           />
         </div>
 
-        <!-- Email -->
         <div class="field">
-          <label for="email">Электронная почта</label>
+          <label for="email">Email</label>
           <input
             type="email"
             id="email"
@@ -54,7 +55,6 @@
           />
         </div>
 
-        <!-- Документ об образовании -->
         <div class="field">
           <label for="doc_type">Документ об образовании</label>
           <select id="doc_type" name="doc_type" required>
@@ -77,37 +77,26 @@
           </select>
         </div>
 
-        <!-- Уровень образования -->
         <div class="field">
           <label for="level">Уровень обучения</label>
           <select id="level" name="level" required>
-            <!-- Заполняется динамически в app.js -->
+            <option value="" disabled selected>Сначала выберите документ</option>
           </select>
         </div>
 
-        <!-- Направление подготовки -->
         <div class="field">
           <label for="direction">Направление подготовки</label>
           <select id="direction" name="direction" required>
-            <!-- Заполняется динамически в app.js -->
+            <option value="" disabled selected>Сначала выберите уровень</option>
           </select>
         </div>
 
-        <button type="submit" id="send" class="btn">
-          Отправить заявку
-        </button>
+        <button type="submit" class="btn">Отправить заявку</button>
       </form>
-
-      <p class="footer">
-        Нажимая кнопку «Отправить заявку», вы подтверждаете корректность
-        введённых данных.
-      </p>
     </div>
   </div>
 
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Наш скрипт -->
-  <script src="app.js"></script>
+  <!-- Логика WebApp -->
+  <script src="app.js" defer></script>
 </body>
 </html>

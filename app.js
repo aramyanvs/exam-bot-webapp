@@ -1,21 +1,20 @@
-// app.js
+// app.js — чистый и рабочий
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Инициализация Telegram WebApp
+document.addEventListener("DOMContentLoaded", () => {
+  // Telegram WebApp объект
   const tg =
     window.Telegram && window.Telegram.WebApp
       ? window.Telegram.WebApp
       : null;
 
-  if (!tg) {
-    console.error(
-      'Telegram WebApp API не найден. Проверьте подключение скрипта: <script src="https://telegram.org/js/telegram-web-app.js"></script>.'
+  if (tg) {
+    tg.ready();
+    tg.expand();
+  } else {
+    console.warn(
+      "Telegram WebApp API не найден. Форма работает в тестовом режиме в браузере."
     );
-    return;
   }
-
-  tg.ready();
-  tg.expand();
 
   // Элементы формы
   const form = document.getElementById("exam-form");
@@ -26,20 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const levelSelect = document.getElementById("level");
   const directionSelect = document.getElementById("direction");
 
-  if (
-    !form ||
-    !fioInput ||
-    !birthInput ||
-    !emailInput ||
-    !docTypeSelect ||
-    !levelSelect ||
-    !directionSelect
-  ) {
-    console.error("Не найдены какие-то элементы формы. Проверь id в index.html.");
-    return;
-  }
-
-  // Справочник направлений по уровню
+  // Карта направлений по уровню
   const DIRECTIONS_BY_LEVEL = {
     Бакалавриат: [
       "Юриспруденция",
@@ -71,23 +57,11 @@ document.addEventListener("DOMContentLoaded", function () {
     { value: "Аспирантура", label: "Аспирантура" },
   ];
 
-  // Заполняет select направлений по выбранному уровню
-  function fillDirections(level) {
-    directionSelect.innerHTML = "";
+  // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
 
-    const list = DIRECTIONS_BY_LEVEL[level] || [];
-    list.forEach((dir) => {
-      const opt = document.createElement("option");
-      opt.value = dir;
-      opt.textContent = dir;
-      directionSelect.appendChild(opt);
-    });
-  }
-
-  // Обновляет допустимые уровни в зависимости от документа
+  // Обновляем список уровней в зависимости от документа
   function updateLevelOptions() {
     const docType = docTypeSelect.value;
-
     let allowedLevels = [];
 
     if (
@@ -103,13 +77,21 @@ document.addEventListener("DOMContentLoaded", function () {
     ) {
       allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
     } else {
-      // на всякий случай — все уровни
+      // На всякий случай — все уровни
       allowedLevels = ["Бакалавриат", "Магистратура", "Аспирантура"];
     }
 
-    // Чистим и заполняем select уровней
     levelSelect.innerHTML = "";
 
+    // Добавляем placeholder
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.textContent = "Выберите уровень";
+    levelSelect.appendChild(placeholder);
+
+    // Добавляем только разрешённые уровни
     ALL_LEVEL_OPTIONS.forEach((opt) => {
       if (allowedLevels.includes(opt.value)) {
         const option = document.createElement("option");
@@ -119,16 +101,37 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    // После обновления уровней сразу подставляем направления
-    if (levelSelect.value) {
-      fillDirections(levelSelect.value);
-    } else {
-      directionSelect.innerHTML = "";
-    }
+    // При смене документа сбрасываем направления
+    updateDirectionOptions();
   }
 
-  // === ВАЛИДАЦИЯ ===
+  // Обновляем направления по выбранному уровню
+  function updateDirectionOptions() {
+    const level = levelSelect.value;
+    directionSelect.innerHTML = "";
 
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.textContent = level
+      ? "Выберите направление"
+      : "Сначала выберите уровень";
+    directionSelect.appendChild(placeholder);
+
+    if (!level || !DIRECTIONS_BY_LEVEL[level]) {
+      return;
+    }
+
+    DIRECTIONS_BY_LEVEL[level].forEach((dir) => {
+      const opt = document.createElement("option");
+      opt.value = dir;
+      opt.textContent = dir;
+      directionSelect.appendChild(opt);
+    });
+  }
+
+  // Простая валидация формы
   function validateForm() {
     const fio = fioInput.value.trim();
     const birth = birthInput.value.trim();
@@ -137,48 +140,62 @@ document.addEventListener("DOMContentLoaded", function () {
     const level = levelSelect.value;
     const direction = directionSelect.value;
 
+    const show = (msg) => {
+      if (tg) {
+        tg.showAlert(msg);
+      } else {
+        alert(msg);
+      }
+    };
+
     if (!fio) {
-      tg.showAlert("Пожалуйста, укажите ФИО.");
+      show("Пожалуйста, укажите ФИО.");
       return false;
     }
 
     if (!birth) {
-      tg.showAlert("Пожалуйста, укажите дату рождения.");
+      show("Пожалуйста, укажите дату рождения.");
       return false;
     }
 
     if (!email) {
-      tg.showAlert("Пожалуйста, укажите email.");
+      show("Пожалуйста, укажите email.");
       return false;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      tg.showAlert("Похоже, email указан неверно.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      show("Похоже, email указан неверно.");
       return false;
     }
 
     if (!docType) {
-      tg.showAlert("Пожалуйста, выберите документ об образовании.");
+      show("Пожалуйста, выберите документ об образовании.");
       return false;
     }
 
     if (!level) {
-      tg.showAlert("Пожалуйста, выберите уровень обучения.");
+      show("Пожалуйста, выберите уровень обучения.");
       return false;
     }
 
     if (!direction) {
-      tg.showAlert("Пожалуйста, выберите направление подготовки.");
+      show("Пожалуйста, выберите направление подготовки.");
       return false;
     }
 
     return true;
   }
 
-  // === СВЯЗЬ С Telegram (отправка данных) ===
+  // === СВЯЗКА ОБРАБОТЧИКОВ ===
 
-  form.addEventListener("submit", function (e) {
+  // При смене документа — обновить уровни
+  docTypeSelect.addEventListener("change", updateLevelOptions);
+
+  // При смене уровня — обновить направления
+  levelSelect.addEventListener("change", updateDirectionOptions);
+
+  // Отправка формы
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -189,34 +206,31 @@ document.addEventListener("DOMContentLoaded", function () {
       fio: fioInput.value.trim(),
       birth: birthInput.value.trim(),
       email: emailInput.value.trim(),
-      doc_type: docTypeSelect.value,
+      doc_type: docTypeSelect.value, // ВАЖНО: doc_type — как в bot.py
       level: levelSelect.value,
       direction: directionSelect.value,
     };
 
-    console.log("Отправляем в бота payload:", payload);
+    console.log("Отправляем в бота:", payload);
 
-    try {
-      tg.sendData(JSON.stringify(payload));
-      tg.showAlert("Заявка отправлена, ожидайте ответ в чате бота.");
-      // tg.close(); // если захочешь автоматически закрывать WebApp
-    } catch (err) {
-      console.error("Ошибка при отправке данных в бота:", err);
-      tg.showAlert("Не удалось отправить заявку. Попробуйте ещё раз.");
+    const msgOk =
+      "Заявка отправлена, ожидайте ответ в чате бота.";
+
+    if (tg) {
+      try {
+        tg.sendData(JSON.stringify(payload));
+        tg.showAlert(msgOk);
+        // Можно закрыть WebApp, если хочешь:
+        // tg.close();
+      } catch (err) {
+        console.error("Ошибка при отправке данных в бота:", err);
+        tg.showAlert(
+          "Не удалось отправить заявку. Попробуйте ещё раз."
+        );
+      }
+    } else {
+      // Режим теста в обычном браузере
+      alert(msgOk + "\n\n(Сейчас вы в тестовом режиме браузера.)");
     }
   });
-
-  // === ОБРАБОТЧИКИ И ПЕРВОНАЧАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ===
-
-  docTypeSelect.addEventListener("change", updateLevelOptions);
-  levelSelect.addEventListener("change", () => {
-    if (levelSelect.value) {
-      fillDirections(levelSelect.value);
-    }
-  });
-
-  // Первичная настройка, если документ уже выбран (или был выбран по умолчанию)
-  if (docTypeSelect.value) {
-    updateLevelOptions();
-  }
 });
